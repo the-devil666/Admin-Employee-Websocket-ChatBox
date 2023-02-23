@@ -21,21 +21,27 @@ var colors = [
     '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
 ];
 
-function connect(event) {
-    username = document.querySelector('#name').value.trim();
 
-    if(username) {
+function connect(event) {
+    // Get the JWT token from the input field
+    const jwtToken = document.querySelector('#jwtToken').value.trim();
+
+    // Decode the JWT token to get the username
+    const tokenPayload = JSON.parse(atob(jwtToken.split('.')[1]));
+    username = tokenPayload.sub;
+
+    if (username) {
         usernamePage.classList.add('hidden');
         chatPage.classList.remove('hidden');
 
-           var sockets = new SockJS('http://localhost:8081/web');
-              stompClient = Stomp.over(sockets);
-
+        const socket = new SockJS('http://localhost:8081/web');
+        stompClient = Stomp.over(socket);
 
         stompClient.connect({}, onConnected, onError);
     }
     event.preventDefault();
 }
+
 
 
 function onConnected() {
